@@ -1,4 +1,4 @@
-import { openModal } from "./modal";
+import { openModal } from './modal.js';
 
 const cardTemplate = document.querySelector('#card-template').content;
 const popupShowImage = document.querySelector('.popup_type_image');
