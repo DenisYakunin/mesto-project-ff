@@ -1,11 +1,6 @@
-import { openModal } from './modal.js';
-
 const cardTemplate = document.querySelector('#card-template').content;
-const popupShowImage = document.querySelector('.popup_type_image');
-const cardImage = document.querySelector('.popup__image');
-const cardName = document.querySelector('.popup__caption');
 
-export const createCard = function (cardData, deleteCard, likeCard) {
+export const createCard = function (cardData, deleteCard, likeCard, openPopupImage) {
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
 
     cardElement.querySelector('.card__title').textContent = cardData.name;
@@ -14,12 +9,8 @@ export const createCard = function (cardData, deleteCard, likeCard) {
     
     cardElement.querySelector('.card__delete-button').addEventListener('click', deleteCard);
     cardElement.querySelector('.card__like-button').addEventListener('click', likeCard);
-    cardElement.querySelector('.card__image').addEventListener('click', () => {
-        openModal(popupShowImage);
-        cardImage.setAttribute('src', cardData.link)
-        cardImage.setAttribute('alt', cardData.link)
-        cardName.textContent = cardData.name;
-    });
+
+    cardElement.querySelector('.card__image').addEventListener('click', () => openPopupImage(cardData.name, cardData.link));
 
     return cardElement;
 }

@@ -3,21 +3,30 @@ import { initialCards } from './cards.js'
 import { createCard, buildCardData, likeCard, deleteCard } from './card.js'
 import { openModal, closeModal, closeWithX } from './modal.js'
 
+// Работа с изображениями
+
+const popupShowImage = document.querySelector('.popup_type_image');
+const cardImage = document.querySelector('.popup__image');
+const cardName = document.querySelector('.popup__caption');
+
+const openPopupImage = (name, link) => {
+    openModal(popupShowImage);
+    cardImage.setAttribute('src', link)
+    cardImage.setAttribute('alt', link)
+    cardName.textContent = name;
+}
+
+popupShowImage.addEventListener("click", (evt) => {
+    closeWithX(evt);
+});
+
 // Инициализация карточек 
 
 const placesList = document.querySelector('.places__list');
 
 initialCards.forEach(function(item) {
-    const cardElement = createCard(item, deleteCard, likeCard)
+    const cardElement = createCard(item, deleteCard, likeCard, openPopupImage)
     placesList.append(cardElement);
-});
-
-// Работа с изображениями
-
-const popupShowImage = document.querySelector('.popup_type_image');
-
-popupShowImage.addEventListener("click", (evt) => {
-    closeWithX(evt);
 });
 
 // Обработка при редактировании профиля
@@ -78,7 +87,7 @@ function handleFormAddSubmit(evt) {
 
     const cardData = buildCardData(cardNameInput.value, cardLinkInput.value);
 
-    const cardElement = createCard(cardData, deleteCard, likeCard)
+    const cardElement = createCard(cardData, deleteCard, likeCard, openPopupImage)
     placesList.prepend(cardElement);
 
     closeModal(popupAdd);
