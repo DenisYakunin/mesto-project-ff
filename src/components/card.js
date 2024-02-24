@@ -2,15 +2,16 @@ const cardTemplate = document.querySelector('#card-template').content;
 
 export const createCard = function (cardData, deleteCard, likeCard, openPopupImage) {
     const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
+    const cardImage = cardElement.querySelector('.card__image');
 
     cardElement.querySelector('.card__title').textContent = cardData.name;
-    cardElement.querySelector('.card__image').src = cardData.link;
-    cardElement.querySelector('.card__image').alt = cardData.name;
+    cardImage.src = cardData.link;
+    cardImage.alt = cardData.name;
     
     cardElement.querySelector('.card__delete-button').addEventListener('click', deleteCard);
     cardElement.querySelector('.card__like-button').addEventListener('click', likeCard);
 
-    cardElement.querySelector('.card__image').addEventListener('click', () => openPopupImage(cardData.name, cardData.link));
+    cardImage.addEventListener('click', () => openPopupImage(cardData.name, cardData.link));
 
     return cardElement;
 }
