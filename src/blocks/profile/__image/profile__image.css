@@ -4,10 +4,22 @@
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-  background-image: url('../../../images/avatar.jpg');
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+}
+
+.profile__image:hover::after {
+  content: '';
+  display: block;
+  cursor: pointer;
+  inline-size: 100%;
+  block-size: 100%;
+  background-image: url(../../../images/edit-icon.svg);
+  background-size: 25%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0.80);
 }
 
 @media screen and (max-width: 740px) {
