@@ -15,7 +15,7 @@ export const closeModal = function (popup) {
     }
   }
   
-  export function closeWithX (evt) {
+  export function closeWithClick (evt) {
     if (evt.target.classList.contains('popup__close') || evt.target.classList.contains("popup")) {
         closeModal(evt.target.closest('.popup'));
     }

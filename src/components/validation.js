@@ -11,6 +11,11 @@ const setEventListeners = (formElement, config) => {
     const buttonElement = formElement.querySelector(config.submitButtonSelector);
 
     toggleButtonState(inputList, buttonElement, config);
+
+    formElement.addEventListener('reset', () => {
+        disableButton(buttonElement, config);
+    });
+
     inputList.forEach((inputElement) => {
         inputElement.addEventListener('input', () => {
             isValid(formElement, inputElement, config)
@@ -18,6 +23,10 @@ const setEventListeners = (formElement, config) => {
       });
     });
 };
+
+const disableButton = (buttonElement, config) => {
+    buttonElement.classList.add(config.inactiveButtonClass);
+}
 
 const isValid = (formElement, inputElement, config) => {
     if (inputElement.validity.patternMismatch) {
@@ -72,13 +81,6 @@ export const clearValidation = (formElement, config) => {
     inputList.forEach(inputElement => {
         isValid(formElement, inputElement, config);
     });
-
-    toggleButtonState(inputList, submitButton, config);
-}
-
-export const checkButton = (formElement, config) => {
-    const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
-    const submitButton = formElement.querySelector(config.submitButtonSelector);
 
     toggleButtonState(inputList, submitButton, config);
 }

@@ -1,8 +1,10 @@
 import '../pages/index.css';
 import { createCard, removeCard, likeCard} from './card.js'
-import { openModal, closeModal, closeWithX } from './modal.js'
+import { openModal, closeModal, closeWithClick } from './modal.js'
 import { enableValidation, clearValidation, checkButton } from './validation.js'
-import { getInitialData, getUserInfo, updateUserInfo, addCard, deleteCard, setLike, deleteLike, updateAvatar } from './api.js'
+import { getInitialData, updateUserInfo, addCard, deleteCard, setLike, deleteLike, updateAvatar } from './api.js'
+import { handleSubmit } from './utils.js'
+
 
 // Профиль
 const userName = document.querySelector('.profile__title');
@@ -18,6 +20,7 @@ const formEditAvatar = document.forms['edit-avatar'];
 const placesList = document.querySelector('.places__list');
 
 // Попапы
+const popups = document.querySelectorAll('.popup')
 const popupShowImage = document.querySelector('.popup_type_image');
 const popupEditProfile = document.querySelector('.popup_type_edit');
 const popupAdd = document.querySelector('.popup_type_new-card');
@@ -62,9 +65,7 @@ function setProfile(profile) {
 // Удаление карточки
 function onDeleteCard(cardElement, cardId) {
     deleteCard(cardId) 
-        .then(() => { 
-            removeCard(cardElement);
-        }) 
+        .then(removeCard(cardElement)) 
         .catch((err) => console.error(err));
 }
 
@@ -73,28 +74,23 @@ function onLikeCard(evt, id) {
     const isLiked = evt.target.classList.contains('card__like-button_is-active');
     const likeMethod = isLiked ? deleteLike : setLike; 
     likeMethod(id) 
-        .then((card) => { 
-            likeCard(evt, card.likes.length);
-        }) 
+        .then((card) => likeCard(evt, card.likes.length)) 
         .catch((err) => console.error(err));
 }
 
 // Инициализация пользователя и карточек
 getInitialData()
-    .then((results) => {
-        setProfile(results[0]);
+    .then(([userData, cards]) => {
+        setProfile(userData);
 
-        userId = results[0]._id;
+        userId = userData._id;
 
-        results[1].forEach(function(item) {
-
+        cards.forEach(function(item) {
             const cardElement = createCard(item, onDeleteCard, onLikeCard, openPopupImage, userId)
             placesList.append(cardElement);
         });
     })
-    .catch((err) => {
-        console.log(err);
-    }); 
+    .catch((err) => console.error(err));
 
 // Открытие изображения карточки
 const openPopupImage = (name, link) => {
@@ -104,17 +100,14 @@ const openPopupImage = (name, link) => {
     cardName.textContent = name;
 }
 
-popupShowImage.addEventListener("click", (evt) => {
-    closeWithX(evt);
+// Закрытие попапов
+popups.forEach((popup) => {
+    popup.addEventListener('click', closeWithClick);
 });
 
 // ФОРМЫ
 
 // Форма редактирования профиля
-popupEditProfile.addEventListener("click", (evt) => {
-    closeWithX(evt);
-});
-
 popupEditButton.addEventListener('click', () => {
     profileNameInput.value = userName.textContent;
     profileDescriptionInput.value = userAbout.textContent;
@@ -122,85 +115,48 @@ popupEditButton.addEventListener('click', () => {
     openModal(popupEditProfile);
 });
 
-function handleFormEditSubmit(evt) {
-    evt.preventDefault();
-    
-    const popupButton = formEditProfile.querySelector('.popup__button');
-    popupButton.textContent = 'Сохранение...';
-
-    userName.textContent = profileNameInput.value;
-    userAbout.textContent = profileDescriptionInput.value;
-
-    updateUserInfo(profileNameInput.value, profileDescriptionInput.value)
-    .then(getUserInfo())
-    .then((profile) => setProfile(profile))
-    .finally(() => {
-        popupButton.textContent = 'Сохранить';
-        closeModal(popupEditProfile);
-    });
+function handleProfileFormSubmit(evt) {
+    function makeRequest() {
+        return updateUserInfo(profileNameInput.value, profileDescriptionInput.value)
+            .then((profile) => setProfile(profile));
+    }
+    handleSubmit(makeRequest, closeModal, evt);
 }
 
-formEditProfile.addEventListener('submit', handleFormEditSubmit);
+formEditProfile.addEventListener('submit', handleProfileFormSubmit);
 
 // Форма добавления карточки
-popupAdd.addEventListener('click', (evt) => {
-    closeWithX(evt);
-});
-
 popupAddCardButton.addEventListener('click', () => {
     openModal(popupAdd);
 });
 
-function handleFormAddSubmit(evt) {
-    evt.preventDefault(); 
-
-    const popupButton = formAddCard.querySelector('.popup__button');
-    popupButton.textContent = 'Сохранение...';
-
-    addCard(cardNameInput.value, cardLinkInput.value)
+function handleCardFormSubmit(evt) {
+    function makeRequest() {
+        return addCard(cardNameInput.value, cardLinkInput.value)
         .then((cardData) => {
             const cardElement = createCard(cardData, onDeleteCard, onLikeCard, openPopupImage, userId)
             placesList.prepend(cardElement);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-        .finally(() => {
-            popupButton.textContent = 'Сохранить';
-            closeModal(popupAdd);
         });
-
-    formAddCard.reset();
-    checkButton(formAddCard, validationConfig);
+    }
+    handleSubmit(makeRequest, closeModal, evt);
 }
 
-formAddCard.addEventListener('submit', handleFormAddSubmit);
+formAddCard.addEventListener('submit', handleCardFormSubmit);
 
 // Форма редактирования аватара
 userAvatar.addEventListener('click', () => {
     openModal(avatarEditPopup);
 });
 
-avatarEditPopup.addEventListener("click", (evt) => {
-    closeWithX(evt);
-});
-
-function handleFormEditAvatarSubmit(evt) {
-    evt.preventDefault();
-    
-    const popupButton = formEditAvatar.querySelector('.popup__button');
-    popupButton.textContent = 'Сохранение...';
-
-    const link = formEditAvatar.avatar.value;
-    updateAvatar(link)
-    .then((profile) => setProfile(profile))
-    .finally(() => {
-        popupButton.textContent = 'Сохранить';
-        closeModal(avatarEditPopup);
-    });
+function handleAvatarFormSubmit(evt) {
+    function makeRequest() {
+        return updateAvatar(formEditAvatar.avatar.value)
+            .then((profile) => setProfile(profile));
+    }
+    handleSubmit(makeRequest, closeModal, evt);
 }
 
-formEditAvatar.addEventListener('submit', handleFormEditAvatarSubmit);
+formEditAvatar.addEventListener('submit', handleAvatarFormSubmit);
 
 // Валидация
 enableValidation(validationConfig);
