@@ -26,6 +26,7 @@ const setEventListeners = (formElement, config) => {
 
 const disableButton = (buttonElement, config) => {
     buttonElement.classList.add(config.inactiveButtonClass);
+    buttonElement.disabled = true;
 }
 
 const isValid = (formElement, inputElement, config) => {
@@ -60,8 +61,7 @@ const hideInputError = (formElement, inputElement, config) => {
 
 const toggleButtonState = (inputList, buttonElement, config) => {
     if (hasInvalidInput(inputList)) {
-        buttonElement.disabled = true;
-        buttonElement.classList.add(config.inactiveButtonClass);
+        disableButton(buttonElement, config)
     } else {
         buttonElement.disabled = false;
         buttonElement.classList.remove(config.inactiveButtonClass);

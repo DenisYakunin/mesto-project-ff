@@ -65,7 +65,7 @@ function setProfile(profile) {
 // Удаление карточки
 function onDeleteCard(cardElement, cardId) {
     deleteCard(cardId) 
-        .then(removeCard(cardElement)) 
+        .then(() => removeCard(cardElement)) 
         .catch((err) => console.error(err));
 }
 
@@ -118,7 +118,7 @@ popupEditButton.addEventListener('click', () => {
 function handleProfileFormSubmit(evt) {
     function makeRequest() {
         return updateUserInfo(profileNameInput.value, profileDescriptionInput.value)
-            .then((profile) => setProfile(profile));
+            .then(setProfile);
     }
     handleSubmit(makeRequest, closeModal, evt);
 }
@@ -151,7 +151,7 @@ userAvatar.addEventListener('click', () => {
 function handleAvatarFormSubmit(evt) {
     function makeRequest() {
         return updateAvatar(formEditAvatar.avatar.value)
-            .then((profile) => setProfile(profile));
+            .then(setProfile);
     }
     handleSubmit(makeRequest, closeModal, evt);
 }
